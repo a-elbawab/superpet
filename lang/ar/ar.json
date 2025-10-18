@@ -1,0 +1,14 @@
+{
+    "profile_edit": "تعديل البروفايل",
+    "email": "البريد الإلكتروني",
+    "phone": "الهاتف",
+    "country": "الدولة",
+    "city": "المحافظة",
+    "address": "العنوان",
+    "orders_count": "عدد الطلبات",
+    "bookings_count": "عدد الحجوزات",
+    "show_all_orders": "عرض كل الطلبات",
+    "show_all_bookings": "عرض كل الحجوزات",
+    "latest_orders": "آخر 6 طلبات",
+    "latest_bookings": "آخر 6 حجوزات"
+}

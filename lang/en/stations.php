@@ -1,0 +1,60 @@
+<?php
+
+return [
+    'singular' => 'Station',
+    'plural' => 'Stations',
+    'empty' => 'There are no stations yet.',
+    'count' => 'Stations Count.',
+    'search' => 'Search',
+    'select' => 'Select Station',
+    'permission' => 'Manage stations',
+    'trashed' => 'Trashed stations',
+    'perPage' => 'Results Per Page',
+    'filter' => 'Search for station',
+    'actions' => [
+        'list' => 'List All',
+        'create' => 'Create a new station',
+        'show' => 'Show station',
+        'edit' => 'Edit station',
+        'delete' => 'Delete station',
+        'restore' => 'Restore',
+        'forceDelete' => 'Delete Forever',
+        'options' => 'Options',
+        'save' => 'Save',
+        'filter' => 'Filter',
+    ],
+    'messages' => [
+        'created' => 'The station has been created successfully.',
+        'updated' => 'The station has been updated successfully.',
+        'deleted' => 'The station has been deleted successfully.',
+        'restored' => 'The station has been restored successfully.',
+    ],
+    'attributes' => [
+        'title' => 'Station title',
+        'price' => 'Station price',
+        'price_usd' => 'Station price (USD)',
+        'event_id' => 'Station event',
+        'currency' => 'Station currency',
+        'type' => 'Station type',
+    ],
+    'dialogs' => [
+        'delete' => [
+            'title' => 'Warning !',
+            'info' => 'Are you sure you want to delete the station ?',
+            'confirm' => 'Delete',
+            'cancel' => 'Cancel',
+        ],
+        'restore' => [
+            'title' => 'Warning !',
+            'info' => 'Are you sure you want to restore the station ?',
+            'confirm' => 'Restore',
+            'cancel' => 'Cancel',
+        ],
+        'forceDelete' => [
+            'title' => 'Warning !',
+            'info' => 'Are you sure you want to delete the station forever ?',
+            'confirm' => 'Delete Forever',
+            'cancel' => 'Cancel',
+        ],
+    ],
+];

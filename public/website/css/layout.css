@@ -1,0 +1,210 @@
+html,
+body {
+    overflow-x: hidden;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+img,
+video,
+iframe {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+
+@media (max-width: 768px) {
+
+    html,
+    body {
+        overflow-x: hidden;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .search-btn .btn,
+    .toggle-icon,
+    .dropdown-toggle {
+        margin-inline: 4px;
+    }
+
+    .toggle-icon {
+        margin-right: 8px;
+    }
+
+    html[dir="rtl"] .toggle-icon {
+        margin-left: 8px;
+        margin-right: 0;
+    }
+}
+
+
+/* RTL Styles */
+html[dir="rtl"] .dropdown-menu {
+    right: auto !important;
+    left: 0 !important;
+    text-align: right;
+}
+
+html[dir="rtl"] {
+    main {
+        padding-right: 15px;
+    }
+
+    header a img {
+        width: 80px;
+        margin-left: 15px;
+    }
+
+    .slick-track {
+        direction: rtl;
+        transform: translate3d(0, 0, 0) !important;
+    }
+
+    .toggle-icon {
+        margin-right: 1rem;
+    }
+}
+
+/* LTR Styles */
+html[dir="ltr"] {
+    header a img {
+        width: 80px;
+        margin-right: 15px;
+    }
+
+    .toggle-icon {
+        margin-left: 1rem;
+    }
+}
+
+.product-item {
+    width: auto;
+}
+
+
+.add-to-cart {
+    /* position: relative; */
+    display: inline-block;
+}
+
+.checkmark-overlay {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background-color: #fff;
+    border-radius: 50%;
+    padding: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    display: none;
+    z-index: 10;
+    animation: fadeInOut 1.5s forwards;
+}
+
+.checkmark-overlay i {
+    color: green;
+    font-size: 20px;
+}
+
+@keyframes fadeInOut {
+    0% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    20% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    80% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+}
+
+@media (max-width: 768px) {
+    .btn.btn-sm {
+        padding: 4px 6px;
+        font-size: 13px;
+    }
+
+    .btn .fa {
+        font-size: 14px;
+    }
+
+    nav a img {
+        width: 83px !important;
+    }
+
+    .iconcart {
+        top: -5px;
+        right: -5px;
+        width: 18px;
+        height: 18px;
+        font-size: 11px;
+    }
+}
+
+.submenu-arrow {
+    margin-left: 8px;
+    font-size: 12px;
+    color: #fff;
+}
+
+html[dir="rtl"] .submenu-arrow {
+    margin-left: 0;
+    margin-right: 8px;
+}
+
+@media (max-width: 991px) {
+    .submenu-arrow {
+        display: inline-block;
+        font-size: 14px;
+        color: #fff;
+    }
+}
+
+.custom-pagination .page-item .page-link {
+    color: #333;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    margin: 0 3px;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease-in-out;
+}
+
+.custom-pagination .page-item.active .page-link {
+    background-color: #0d6efd;
+    color: white;
+    border-color: #0d6efd;
+    font-weight: bold;
+}
+
+.custom-pagination .page-item .page-link:hover {
+    background-color: #e9ecef;
+    border-color: #ced4da;
+}
+
+.custom-pagination {
+    direction: rtl;
+    /* هذا يجعل الشكل مناسب للعربية */
+}
+
+html[dir="ltr"] .custom-pagination {
+    direction: ltr;
+}

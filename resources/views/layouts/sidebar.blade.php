@@ -1,0 +1,30 @@
+@component('dashboard::components.sidebarItem')
+    @slot('url', route('dashboard.home'))
+    @slot('name', trans('dashboard.home'))
+    @slot('icon', 'home')
+    @slot('active', request()->routeIs('dashboard.home'))
+@endcomponent
+
+@include('dashboard.accounts.sidebar')
+@include('dashboard.countries.partials.actions.sidebar')
+@include('dashboard.pages.partials.actions.sidebar')
+@include('dashboard.categories.partials.actions.sidebar')
+@include('dashboard.notifications.sidebar')
+
+@include('dashboard.products.partials.actions.sidebar')
+@include('dashboard.attributes.partials.actions.sidebar')
+@include('dashboard.invoices.partials.actions.sidebar')
+@include('dashboard.tags.partials.actions.sidebar')
+@include('dashboard.services.partials.actions.sidebar')
+@include('dashboard.bookings.partials.actions.sidebar')
+@include('dashboard.orders.partials.actions.sidebar')
+@include('dashboard.hints.partials.actions.sidebar')
+@include('dashboard.branches.partials.actions.sidebar')
+@include('dashboard.posts.partials.actions.sidebar')
+@include('dashboard.sliders.partials.actions.sidebar')
+@include('dashboard.teams.partials.actions.sidebar')
+@include('dashboard.galleries.partials.actions.sidebar')
+{{-- The sidebar of generated crud will set here: Don't remove this line --}}
+@include('dashboard.feedback.partials.actions.sidebar')
+@include('dashboard.settings.sidebar')
+

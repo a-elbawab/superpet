@@ -1,0 +1,4 @@
+- ## Get Started
+    - [Overview](/{{route}}/{{version}}/overview)
+    - [Activity Log](/{{route}}/{{version}}/log)
+    - [Soft Delete](/{{route}}/{{version}}/softdelete)

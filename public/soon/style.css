@@ -1,0 +1,62 @@
+@import 'assets/css/bootstrap-4.5.3.min.css';
+@import 'assets/css/helper-4.0.0.min.css';
+
+/* #0f5147 */
+.fullpage{
+    min-height: 100vh;
+    background-image: url(assets/img/body.jpg);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.textcolor{
+    color: #00e9af;
+    animation: color 4s linear infinite;
+}
+@keyframes color {
+    10% {
+        text-shadow: 0 0 20px #00e9af;
+    }
+    20% {
+        text-shadow: 0 0 25px #00e9af;
+    }
+    30% {
+        text-shadow: 0 0 30px #00e9af;
+    }
+    40% {
+        text-shadow: 0 0 35px #00e9af;
+    }
+    50% {
+        text-shadow: 0 0 40px #00e9af;
+    }
+    60% {
+        text-shadow: 0 0 35px #00e9af;
+    }
+    70% {
+        text-shadow: 0 0 30px #00e9af;
+    }
+    80% {
+        text-shadow: 0 0 25px #00e9af;
+    }
+    90% {
+        text-shadow: 0 0 20px #00e9af;
+    }
+    100% {
+        text-shadow: 0 0 15px #00e9af;
+    }
+  }
+.margintop{margin-top: -150px;}
+/*--------- Responsive ----- */
+@media (max-width: 992px) {
+    .margintop{margin-top: -100px;}
+}
+@media (max-width: 768px) {
+    .margintop{margin-top: -60px;}
+}
+@media (max-width: 500px) {
+    .margintop{margin-top: -40px;}
+}
+@media (max-width: 375px) {
+    .margintop{margin-top: -30px;}
+	
+}
