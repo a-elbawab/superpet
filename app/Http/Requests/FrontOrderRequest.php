@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\ValidPaymentMethod;
 use Illuminate\Foundation\Http\FormRequest;
 
 class FrontOrderRequest extends FormRequest
@@ -25,7 +26,12 @@ class FrontOrderRequest extends FormRequest
             'phone' => 'required|string|max:255',
             'total' => 'required|numeric',
             'items' => 'required|json',
-            'payment_method' => 'required|string|in:' . implode(',', array_keys(trans('orders.payment_methods'))),
+            'payment_method' => [
+                'required',
+                'string',
+                'in:' . implode(',', array_keys(trans('orders.payment_methods'))),
+                new ValidPaymentMethod($this->delivery_method, $this->area_id),
+            ],
         ];
     }
 

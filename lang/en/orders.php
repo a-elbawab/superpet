@@ -92,4 +92,10 @@ return [
         Order::DELIVERY_METHOD_PICKUP => 'Branch pickup',
         Order::DELIVERY_METHOD_DELIVERY => 'Delivery',
     ],
+
+    'shipping_notes' => [
+        'inside_alexandria' => "Within Alexandria:\n\nOrders placed before 9:00 PM are delivered within 1 hour.\nOrders placed after 9:00 PM will be delivered the next day.",
+        'outside_alexandria' => "Outside Alexandria:\n\nDelivery takes 4 to 7 business days, depending on the shipping company.",
+        'title' => 'Shipping Note',
+    ],
 ];

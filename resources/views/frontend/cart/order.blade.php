@@ -154,7 +154,7 @@
                             <select id="area_id" name="area_id" class="form-control">
                                 <option value>@lang('frontend.orders.select_area')</option>
                                 @foreach ($areas as $area)
-                                    <option value="{{ $area->id }}" @if(old('area_id') == $area->id) selected @endif>
+                                    <option value="{{ $area->id }}" data-city-id="{{ $area->city_id }}" @if(old('area_id') == $area->id) selected @endif>
                                         {{ $area->name }}</option>
                                 @endforeach
                             </select>
@@ -162,13 +162,22 @@
                         <div class="mb-3">
                             <label for="paymentMethod"
                                 class="form-label">@lang('frontend.orders.payment_method')</label>
-                            <select id="paymentMethod" name="payment_method" class="form-control">
+                            <select id="paymentMethod" name="payment_method" class="form-control" required>
                                 @foreach (trans('orders.payment_methods') as $key => $method)
-                                    <option value="{{ $key }}" @if(old('payment_method') == $key) selected @endif>
+                                    <option value="{{ $key }}" data-payment-method-id="{{ $key }}" @if(old('payment_method') == $key) selected @endif>
                                         {{ $method }}</option>
                                 @endforeach
                             </select>
                         </div>
+                        
+                        <!-- Shipping Note -->
+                        <div class="mb-3" id="shipping-note-container" style="display: none;">
+                            <div class="alert alert-info">
+                                <strong>@lang('orders.shipping_notes.title'):</strong>
+                                <div id="shipping-note-content" style="white-space: pre-line; margin-top: 10px;"></div>
+                            </div>
+                        </div>
+                        
                         <button type="submit" class="btn btn-success w-100">@lang('frontend.orders.submit')</button>
                     </form>
                 </div>
@@ -180,6 +189,166 @@
 @section('scripts')
     <script>
         $(document).ready(function () {
+            // Payment method constants (must match backend)
+            const PAYMENT_METHODS = {
+                CASH_ON_DELIVERY: 1,
+                ONLINE: 2,
+                VISA_ON_DELIVERY: 3
+            };
+            const DELIVERY_METHODS = {
+                PICKUP: 'pickup',
+                DELIVERY: 'delivery'
+            };
+            const ALEXANDRIA_CITY_ID = 24;
+            
+            // User's city_id from backend (if authenticated)
+            const userCityId = @json(auth()->check() ? auth()->user()->city_id : null);
+            
+            // Current locale
+            const currentLocale = @json(app()->getLocale());
+            
+            // Shipping notes translations
+            const shippingNotes = {
+                ar: {
+                    inside_alexandria: @json(trans('orders.shipping_notes.inside_alexandria', [], 'ar')),
+                    outside_alexandria: @json(trans('orders.shipping_notes.outside_alexandria', [], 'ar'))
+                },
+                en: {
+                    inside_alexandria: @json(trans('orders.shipping_notes.inside_alexandria', [], 'en')),
+                    outside_alexandria: @json(trans('orders.shipping_notes.outside_alexandria', [], 'en'))
+                }
+            };
+
+            /**
+             * Get allowed payment methods based on delivery method and city ID
+             */
+            function getAllowedPaymentMethods(deliveryMethod, cityId) {
+                // Rule 2: If delivery method is NOT "delivery", allow all payment methods
+                if (deliveryMethod !== DELIVERY_METHODS.DELIVERY) {
+                    return [
+                        PAYMENT_METHODS.CASH_ON_DELIVERY,
+                        PAYMENT_METHODS.ONLINE,
+                        PAYMENT_METHODS.VISA_ON_DELIVERY
+                    ];
+                }
+
+                // Rule 1: If delivery method IS "delivery"
+                if (deliveryMethod === DELIVERY_METHODS.DELIVERY) {
+                    // Convert cityId to number for proper comparison
+                    const cityIdNum = cityId ? parseInt(cityId) : null;
+                    
+                    // If no city_id available yet, show all methods (waiting for area selection)
+                    if (cityIdNum === null) {
+                        return [
+                            PAYMENT_METHODS.CASH_ON_DELIVERY,
+                            PAYMENT_METHODS.ONLINE,
+                            PAYMENT_METHODS.VISA_ON_DELIVERY
+                        ];
+                    }
+                    
+                    // Alexandria: allow COD, Online, and Visa on Delivery
+                    if (cityIdNum === ALEXANDRIA_CITY_ID) {
+                        return [
+                            PAYMENT_METHODS.CASH_ON_DELIVERY,
+                            PAYMENT_METHODS.ONLINE,
+                            PAYMENT_METHODS.VISA_ON_DELIVERY
+                        ];
+                    }
+                    
+                    // Other cities: allow only Online (Visa)
+                    return [PAYMENT_METHODS.ONLINE];
+                }
+
+                // Default: allow all
+                return [
+                    PAYMENT_METHODS.CASH_ON_DELIVERY,
+                    PAYMENT_METHODS.ONLINE,
+                    PAYMENT_METHODS.VISA_ON_DELIVERY
+                ];
+            }
+
+            /**
+             * Get shipping note text based on city (using translations)
+             */
+            function getShippingNote(cityId) {
+                if (!cityId) {
+                    return null;
+                }
+                
+                // Use current locale to get the appropriate translation
+                const locale = currentLocale === 'ar' ? 'ar' : 'en';
+                
+                if (cityId === ALEXANDRIA_CITY_ID) {
+                    // Inside Alexandria
+                    return shippingNotes[locale].inside_alexandria;
+                }
+                
+                // Outside Alexandria
+                return shippingNotes[locale].outside_alexandria;
+            }
+
+            /**
+             * Update shipping note display
+             */
+            function updateShippingNote(deliveryMethod, cityId) {
+                const $shippingNoteContainer = $('#shipping-note-container');
+                const $shippingNoteContent = $('#shipping-note-content');
+                
+                // Only show note for delivery method
+                if (deliveryMethod === DELIVERY_METHODS.DELIVERY && cityId) {
+                    const note = getShippingNote(cityId);
+                    if (note) {
+                        $shippingNoteContent.text(note);
+                        $shippingNoteContainer.show();
+                    } else {
+                        $shippingNoteContainer.hide();
+                    }
+                } else {
+                    $shippingNoteContainer.hide();
+                }
+            }
+
+            /**
+             * Filter payment method options based on delivery method and city
+             */
+            function filterPaymentMethods(deliveryMethod, cityId) {
+                const $paymentSelect = $('#paymentMethod');
+                const selectedValue = $paymentSelect.val();
+                const allowedMethods = getAllowedPaymentMethods(deliveryMethod, cityId);
+                
+                console.log('Filtering payment methods - deliveryMethod:', deliveryMethod, 'cityId:', cityId, 'allowedMethods:', allowedMethods);
+                
+                // Hide/show options based on allowed methods
+                $paymentSelect.find('option').each(function() {
+                    const $option = $(this);
+                    const paymentMethodId = parseInt($option.attr('data-payment-method-id') || $option.val());
+                    
+                    if ($option.val() === '') {
+                        return; // Keep the placeholder/default option
+                    }
+                    
+                    if (allowedMethods.includes(paymentMethodId)) {
+                        $option.show();
+                        console.log('Showing payment method:', paymentMethodId);
+                    } else {
+                        $option.hide();
+                        console.log('Hiding payment method:', paymentMethodId);
+                        // If this option was selected and it's not allowed, clear selection
+                        if ($option.val() == selectedValue) {
+                            $paymentSelect.val('');
+                        }
+                    }
+                });
+
+                // If no valid option is selected, select the first visible option
+                if (!$paymentSelect.val() || !$paymentSelect.find('option:selected').is(':visible')) {
+                    const firstVisible = $paymentSelect.find('option:visible').not('[value=""]').first();
+                    if (firstVisible.length) {
+                        $paymentSelect.val(firstVisible.val());
+                    }
+                }
+            }
+
             function toggleFields(deliveryMethod) {
                 if (deliveryMethod === 'delivery') {
                     $('#area_id_div').show();
@@ -190,17 +359,30 @@
                     $('#email_div').show();
                     $('#address').attr('required', true);
                     $('#email').attr('required', true);
+                    
+                    // Update payment methods when switching to delivery
+                    // Priority: Use area's city_id if area is selected, otherwise use user's city_id
+                    const selectedArea = $('#area_id option:selected');
+                    const areaCityId = selectedArea.val() ? selectedArea.attr('data-city-id') : null;
+                    const cityId = (areaCityId ? parseInt(areaCityId) : null) || userCityId;
+                    console.log('Delivery selected - Area city_id:', areaCityId, 'User city_id:', userCityId, 'Final cityId:', cityId);
+                    filterPaymentMethods(deliveryMethod, cityId);
+                    updateShippingNote(deliveryMethod, cityId);
                 } else if (deliveryMethod === 'pickup') {
                     $('#branch_id_div').show();
                     $('#area_id_div').hide();
                     $('#area_id').val('').change();
                     $('.delivery_price').val(0);
 
-                     $('#address_div').hide();
+                    $('#address_div').hide();
                     $('#email_div').hide();
                     $('#address').removeAttr('required');
                     $('#email').removeAttr('required');
                     updateTotal(0);
+                    
+                    // Show all payment methods for pickup
+                    filterPaymentMethods(deliveryMethod, null);
+                    updateShippingNote(deliveryMethod, null);
                 } else {
                     $('#branch_id_div').hide();
                     $('#area_id_div').hide();
@@ -211,10 +393,12 @@
                     $('#email_div').hide();
                     $('#address').removeAttr('required');
                     $('#email').removeAttr('required');
+                    
+                    // Show all payment methods
+                    filterPaymentMethods(deliveryMethod, null);
+                    updateShippingNote(deliveryMethod, null);
                 }
             }
-
-
 
             function updateTotal(deliveryPrice) {
                 const baseTotal = parseFloat("{{ $finalTotal }}");
@@ -225,13 +409,33 @@
                 $('.total_price').val(finalTotal);
             }
 
+            // Delivery method change handler
             $('#deliveryMethod').on('change', function () {
                 const deliveryMethod = $(this).val();
                 toggleFields(deliveryMethod);
             });
 
+            // Area change handler - updates both shipping price and payment methods
             $('#area_id').on('change', function () {
                 const areaId = $(this).val();
+                const deliveryMethod = $('#deliveryMethod').val();
+                const areaCityId = $(this).find('option:selected').attr('data-city-id');
+                
+                // Update payment methods based on selected area
+                // Priority: Use area's city_id when area is selected (overrides user's city_id)
+                if (deliveryMethod === DELIVERY_METHODS.DELIVERY) {
+                    let cityId = null;
+                    if (areaId && areaCityId) {
+                        cityId = parseInt(areaCityId);
+                    } else if (!areaId && userCityId) {
+                        cityId = userCityId;
+                    }
+                    console.log('Area changed - Area ID:', areaId, 'Area city_id:', areaCityId, 'User city_id:', userCityId, 'Final cityId:', cityId, 'Alexandria check:', cityId === ALEXANDRIA_CITY_ID);
+                    filterPaymentMethods(deliveryMethod, cityId);
+                    updateShippingNote(deliveryMethod, cityId);
+                }
+                
+                // Update shipping price
                 if (areaId) {
                     $.ajax({
                         url: '/get-area-shipping-price/' + areaId,
@@ -246,8 +450,15 @@
                 }
             });
 
-            // أول تحميل للصفحة
-            toggleFields($('#deliveryMethod').val());
+            // Initial setup on page load
+            const initialDeliveryMethod = $('#deliveryMethod').val();
+            toggleFields(initialDeliveryMethod);
+            
+            // If user is logged in with city_id and delivery is selected, filter payment methods
+            if (userCityId && initialDeliveryMethod === DELIVERY_METHODS.DELIVERY) {
+                filterPaymentMethods(initialDeliveryMethod, userCityId);
+                updateShippingNote(initialDeliveryMethod, userCityId);
+            }
         });
     </script>
 

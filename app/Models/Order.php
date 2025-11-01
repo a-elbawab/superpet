@@ -34,9 +34,10 @@ class Order extends Model
     const ONLINE = 2;
     const VISA_ON_DELIVERY = 3;
 
-
     const DELIVERY_METHOD_PICKUP = 'pickup';
     const DELIVERY_METHOD_DELIVERY = 'delivery';
+
+    const ALEXANDRIA_CITY_ID = 24;
 
 
     /**
@@ -57,7 +58,8 @@ class Order extends Model
         'payment_method',
         'branch_id',
         'delivery_method',
-        'delivery_price'
+        'delivery_price',
+        'area_id'
     ];
 
     public function getItemsAttribute($value)
@@ -91,5 +93,10 @@ class Order extends Model
     public function branch()
     {
         return $this->belongsTo(Branch::class);
+    }
+
+    public function area()
+    {
+        return $this->belongsTo(Area::class);
     }
 }

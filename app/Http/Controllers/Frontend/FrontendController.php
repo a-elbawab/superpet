@@ -342,7 +342,9 @@ class FrontendController extends Controller
 
         $finalTotal = $totalPrice - $discount;
 
-        return view('frontend.cart.order', compact('cartItems', 'percentageDiscount', 'finalTotal', 'totalPrice', 'discount', 'branches', 'areas'));
+        // Get user's city_id if authenticated
+        $userCityId = auth()->check() ? auth()->user()->city_id : null;
+        return view('frontend.cart.order', compact('cartItems', 'percentageDiscount', 'finalTotal', 'totalPrice', 'discount', 'branches', 'areas', 'userCityId'));
     }
 
 
