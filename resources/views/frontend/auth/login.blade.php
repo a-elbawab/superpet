@@ -50,7 +50,9 @@
                             <div class="form-group mb-3">
                                 {!! NoCaptcha::display() !!}
                             </div>
-                            <button class="btn btn-primary d-block ms-auto">@lang('frontend.navbar.login')</button>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary">@lang('frontend.navbar.login')</button>
+                            </div>
                         </form>
                     </div>
                 </div>

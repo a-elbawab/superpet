@@ -27,6 +27,8 @@
             </th>
             <th>@lang('orders.attributes.name')</th>
             <th>@lang('orders.attributes.status')</th>
+            <th>@lang('orders.attributes.payment_method')</th>
+            <th>@lang('orders.attributes.created_at')</th>
             <th style="width: 160px">...</th>
         </tr>
         </thead>
@@ -41,9 +43,15 @@
                        class="text-decoration-none text-ellipsis">
                         {{ $order->name }}
                     </a>
-                </td>
+                </td>   
                 <td>
                     {{ trans('orders.statuses.' . $order->status) }}
+                </td>
+                <td>
+                    {{ trans('orders.payment_methods.' . $order->payment_method) }}
+                </td>
+                <td>
+                    {{ $order->created_at->timezone('Africa/Cairo')->format('Y-m-d H:i') }}
                 </td>
 
                 <td style="width: 160px">

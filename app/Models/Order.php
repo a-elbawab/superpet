@@ -70,7 +70,7 @@ class Order extends Model
         $percentageDiscount = 0;
 
         if (auth()->check() && auth()->user()->orders()->count() == 0) {
-            $percentageDiscount += 5; //first order 5% discount
+            $percentageDiscount += 10; //first order 10% discount
         }
 
         $discount = $toalPrice * ($percentageDiscount / 100);

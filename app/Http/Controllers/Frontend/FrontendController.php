@@ -366,11 +366,11 @@ class FrontendController extends Controller
         if ($request->payment_method == Order::ONLINE) {
             $this->payment($order);
         }
-        if ($request->payment_method == Order::VALU) {
-            $this->payWithValu($order);
-            return true;
+        if ($request->payment_method == Order::CASH_ON_DELIVERY||$request->payment_method == Order::VISA_ON_DELIVERY) {//||$request->payment_method == Order::VISA_ON_DELIVERY
+            // $this->payWithValu($order);
+            // return true;
         }
-
+info($request->all());
         if ($request->hasFile('recipt'))
             $order->addMediaFromRequest('recipt')->toMediaCollection('recipt');
 

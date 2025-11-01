@@ -32,6 +32,7 @@ return [
     'error_occurred' => 'An error occurred:',
     'register_to_notify' => 'Register Now !',
     'out_of_stock' => 'Out of Stock, Notify Me !',
+    'is_out_of_stock' => 'Out of stock',
     'categories' => 'Categories',
     'category' => 'Category',
     'tags' => 'Tags',

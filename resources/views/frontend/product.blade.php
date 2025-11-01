@@ -96,6 +96,7 @@
                                     </span>
                                 </div>
                                 <hr class="my-4">
+                                @if($product->stock > 0)
                                 <div class="add-to-cart">
                                                         <a href="#/"
                                                             onclick="carting({ id: '{{ $product->id }}', name: '{{ $product->name }}', price: {{ $product->price }}, quantity: 1, image: '{{ $product->main_image }}' }); showCheckmark(this);">
@@ -105,6 +106,11 @@
                                                             <i class="fa-solid fa-circle-check"></i>
                                                         </div>
                                                     </div>
+                                @else
+                                <div class="out-of-stock">
+                                    <span class="text-danger fw-bold">@lang('frontend.is_out_of_stock')</span>
+                                </div>
+                                @endif
                                 <hr class="my-4">
                                 <ul class="product_meta mt-2">
                                     <li><span class="theme-bg-clr">@lang('frontend.category') :</span>
@@ -175,6 +181,7 @@
                                         <img src="{{ $item->main_image }}" alt="{{ $item->name }}">
                                     </a>
 
+                                    @if($item->stock > 0)
                                     <div class="add-to-cart">
                                                         <a href="#/"
                                                             onclick="carting({ id: '{{ $item->id }}', name: '{{ $item->name }}', price: {{ $item->price }}, quantity: 1, image: '{{ $item->main_image }}' }); showCheckmark(this);">
@@ -184,6 +191,11 @@
                                                             <i class="fa-solid fa-circle-check"></i>
                                                         </div>
                                                     </div>
+                                    @else
+                                    <div class="add-to-cart">
+                                        <span class="text-danger fw-bold">@lang('frontend.is_out_of_stock')</span>
+                                    </div>
+                                    @endif
 
 
                                 </div>

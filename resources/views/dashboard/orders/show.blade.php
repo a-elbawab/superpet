@@ -76,6 +76,9 @@
                             <th width="200">@lang('orders.attributes.discount')</th>
                             <td>{{ $order->discount }}</td>
                         </tr>
+                        <tr>
+                            <th width="200">@lang('orders.attributes.created_at')</th>
+                            <td>{{ $order->created_at->timezone('Africa/Cairo')->format('Y-m-d H:i') }}</td>
                         </tr>
                     </tbody>
                 </table>

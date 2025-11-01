@@ -31,6 +31,7 @@ return [
 
     'click_here' => 'اضغط هنا',
     'out_of_stock' => 'غير متوفر , أبلغيني !',
+    'is_out_of_stock' => 'غير متوفر',
     'out_of_stock_no_user' => 'نفاد المخزون. لا يوجد ملف شخصي للإعلام.',
     'error_occurred' => 'حدث خطأ:',
     'register_to_notify' => 'سجل الآن !',

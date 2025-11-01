@@ -16,6 +16,7 @@ return [
     'failed' => 'These credentials do not match our records.',
     'password' => 'The password you entered is incorrect.',
     'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
+    'email_not_verified' => 'You must verify your email address before logging in.',
     'welcome'=>' Welcome',
     'login'=>'Login',
     'attributes' => [
