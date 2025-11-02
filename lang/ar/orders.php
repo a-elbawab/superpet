@@ -92,4 +92,9 @@ return [
         Order::DELIVERY_METHOD_PICKUP => 'إستلام من الفرع',
         Order::DELIVERY_METHOD_DELIVERY => 'توصيل',
     ],
+
+    'validation' => [
+        'city_required_for_delivery' => 'يرجى اختيار منطقة لتحديد موقع التوصيل.',
+        'payment_method_not_allowed' => 'طريقة الدفع المحددة غير متاحة. الطرق المسموحة: :allowed_methods',
+    ],
 ];

@@ -130,7 +130,7 @@
                         <input class='delivery_price' type="hidden" name="delivery_price" value="">
                         <div class="mb-3" id="delivery_method_div">
                             <label for="deliveryMethod"
-                                class="form-label">@lang('frontend.orders.payment_method')</label>
+                                class="form-label">@lang('frontend.orders.delivery_method')</label>
                             <select id="deliveryMethod" name="delivery_method" class="form-control">
                                 @foreach (trans('orders.delivery_methods') as $key => $method)
                                     <option value="{{ $key }}" @if(old('delivery_method') == $key) selected @endif>
@@ -180,8 +180,31 @@
 @section('scripts')
     <script>
         $(document).ready(function () {
+            // Store all payment methods on page load
+            const allPaymentMethods = [];
+            $('#paymentMethod option').each(function() {
+                allPaymentMethods.push({
+                    value: $(this).val(),
+                    text: $(this).text()
+                });
+            });
+
+            // Payment method constants (must match backend Order model)
+            const PAYMENT_METHODS = {
+                CASH_ON_DELIVERY: 1,
+                ONLINE: 2,
+                VISA_ON_DELIVERY: 3
+            };
+
+            const DELIVERY_METHODS = {
+                DELIVERY: 'delivery',
+                PICKUP: 'pickup'
+            };
+
+            const ALEXANDRIA_CITY_ID = 24;
+
             function toggleFields(deliveryMethod) {
-                if (deliveryMethod === 'delivery') {
+                if (deliveryMethod === DELIVERY_METHODS.DELIVERY) {
                     $('#area_id_div').show();
                     $('#branch_id_div').hide();
                     $('#branch_id').val('').change();
@@ -190,13 +213,13 @@
                     $('#email_div').show();
                     $('#address').attr('required', true);
                     $('#email').attr('required', true);
-                } else if (deliveryMethod === 'pickup') {
+                } else if (deliveryMethod === DELIVERY_METHODS.PICKUP) {
                     $('#branch_id_div').show();
                     $('#area_id_div').hide();
                     $('#area_id').val('').change();
                     $('.delivery_price').val(0);
 
-                     $('#address_div').hide();
+                    $('#address_div').hide();
                     $('#email_div').hide();
                     $('#address').removeAttr('required');
                     $('#email').removeAttr('required');
@@ -212,9 +235,94 @@
                     $('#address').removeAttr('required');
                     $('#email').removeAttr('required');
                 }
+
+                // Update payment methods when delivery method changes
+                updatePaymentMethods();
             }
 
+            function updatePaymentMethods() {
+                const deliveryMethod = $('#deliveryMethod').val();
+                const currentPaymentMethod = $('#paymentMethod').val();
+                let allowedMethods = [];
 
+                if (deliveryMethod === DELIVERY_METHODS.DELIVERY) {
+                    // Get the selected area to determine city_id
+                    const areaId = $('#area_id').val();
+
+                    if (areaId) {
+                        // Priority 1: Fetch city info from the selected area
+                        $.ajax({
+                            url: '/get-area-shipping-price/' + areaId,
+                            method: 'GET',
+                            success: function (response) {
+                                updateTotal(response.shipping_price);
+                                filterPaymentMethodsByCity(response.city_id, currentPaymentMethod);
+                            },
+                            error: function () {
+                                alert("حدث خطأ أثناء جلب سعر الشحن.");
+                            }
+                        });
+                    } else {
+                        // Priority 2: If no area selected, check if user is authenticated and has city_id
+                        @if(auth()->check() && auth()->user()->city_id)
+                            const userCityId = {{ auth()->user()->city_id }};
+                            filterPaymentMethodsByCity(userCityId, currentPaymentMethod);
+                        @else
+                            // Priority 3: No city resolved, show only online payment by default
+                            allowedMethods = allPaymentMethods.filter(method =>
+                                method.value == PAYMENT_METHODS.ONLINE
+                            );
+                            updatePaymentMethodOptions(allowedMethods, currentPaymentMethod);
+                        @endif
+                    }
+                } else {
+                    // For pickup or other methods, allow all payment methods
+                    allowedMethods = allPaymentMethods;
+                    updatePaymentMethodOptions(allowedMethods, currentPaymentMethod);
+                }
+            }
+
+            function filterPaymentMethodsByCity(cityId, currentPaymentMethod) {
+                let allowedMethods = [];
+
+                if (cityId == ALEXANDRIA_CITY_ID) {
+                    // Alexandria: allow Cash on Delivery (1), Online (2), and Visa on Delivery (3)
+                    allowedMethods = allPaymentMethods;
+                } else {
+                    // Other cities: allow only Online (2)
+                    allowedMethods = allPaymentMethods.filter(method =>
+                        method.value == PAYMENT_METHODS.ONLINE
+                    );
+                }
+
+                updatePaymentMethodOptions(allowedMethods, currentPaymentMethod);
+            }
+
+            function updatePaymentMethodOptions(allowedMethods, currentPaymentMethod) {
+                const $paymentMethod = $('#paymentMethod');
+
+                // Clear current options
+                $paymentMethod.empty();
+
+                // Add allowed methods
+                allowedMethods.forEach(function(method) {
+                    const selected = method.value == currentPaymentMethod ? 'selected' : '';
+                    $paymentMethod.append(`<option value="${method.value}" ${selected}>${method.text}</option>`);
+                });
+
+                // If current payment method is not in allowed methods, select the first available
+                if (allowedMethods.length > 0 && !allowedMethods.find(m => m.value == currentPaymentMethod)) {
+                    $paymentMethod.val(allowedMethods[0].value);
+                }
+
+                // Disable submit if no payment methods available
+                if (allowedMethods.length === 0) {
+                    $('button[type="submit"]').prop('disabled', true);
+                    $paymentMethod.append(`<option value="">@lang('frontend.orders.no_payment_methods')</option>`);
+                } else {
+                    $('button[type="submit"]').prop('disabled', false);
+                }
+            }
 
             function updateTotal(deliveryPrice) {
                 const baseTotal = parseFloat("{{ $finalTotal }}");
@@ -233,11 +341,19 @@
             $('#area_id').on('change', function () {
                 const areaId = $(this).val();
                 if (areaId) {
+                    const deliveryMethod = $('#deliveryMethod').val();
+                    const currentPaymentMethod = $('#paymentMethod').val();
+
                     $.ajax({
                         url: '/get-area-shipping-price/' + areaId,
                         method: 'GET',
                         success: function (response) {
                             updateTotal(response.shipping_price);
+
+                            // Update payment methods based on city
+                            if (deliveryMethod === DELIVERY_METHODS.DELIVERY) {
+                                filterPaymentMethodsByCity(response.city_id, currentPaymentMethod);
+                            }
                         },
                         error: function () {
                             alert("حدث خطأ أثناء جلب سعر الشحن.");
@@ -246,7 +362,7 @@
                 }
             });
 
-            // أول تحميل للصفحة
+            // Initialize on page load
             toggleFields($('#deliveryMethod').val());
         });
     </script>

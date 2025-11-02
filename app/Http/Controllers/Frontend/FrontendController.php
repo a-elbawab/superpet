@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Events\FeedbackSent;
+use App\Helpers\CheckoutHelper;
 use App\Http\Requests\ContactRequest;
 use App\Http\Requests\FrontOrderRequest;
 use App\Models\Admin;
@@ -352,10 +353,14 @@ class FrontendController extends Controller
      */
     public function processOrder(FrontOrderRequest $request)
     {
+        // Resolve the city for the order
+        $cityId = CheckoutHelper::resolveCheckoutCityId($request->area_id);
+
         $request->merge([
             'user_id' => auth()->id(),
             'discount' => Order::getOrderDiscount($request->total),
-            'delivery_price' => $request->delivery_price
+            'delivery_price' => $request->delivery_price ?? 0,
+            'city_id' => $cityId,
         ]);
 
         /**
@@ -379,6 +384,27 @@ info($request->all());
         flash()->overlay(" ", trans('feedback.messages.created'));
 
         return redirect()->route('success', $order);
+    }
+
+    /**
+     * AJAX endpoint to get area shipping price and city info
+     *
+     * @param int $areaId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getAreaShippingPrice($areaId)
+    {
+        $area = Area::with('city')->find($areaId);
+
+        if (!$area) {
+            return response()->json(['error' => 'Area not found'], 404);
+        }
+
+        return response()->json([
+            'shipping_price' => $area->shipping_price ?? 0,
+            'city_id' => $area->city_id,
+            'city_name' => $area->city->name ?? null,
+        ]);
     }
 
 

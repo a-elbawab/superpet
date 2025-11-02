@@ -103,8 +103,4 @@ Route::get('/change-language/{lang}', function ($lang) {
 })->name('change.language');
 
 
-Route::get('/get-area-shipping-price/{area}', function (Area $area) {
-    return response()->json([
-        'shipping_price' => $area->shipping_price,
-    ]);
-});
+Route::get('/get-area-shipping-price/{area}', 'Frontend\FrontendController@getAreaShippingPrice');

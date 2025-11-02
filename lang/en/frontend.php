@@ -161,6 +161,7 @@ return [
         'phone' => 'Phone',
         'address' => 'Address',
         'payment_method' => 'Payment Method',
+        'delivery_method' => 'Delivery Method',
         'submit' => 'Submit',
         'select_branch' => 'select branch',
         'select_area' => 'select area',

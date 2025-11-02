@@ -57,7 +57,9 @@ class Order extends Model
         'payment_method',
         'branch_id',
         'delivery_method',
-        'delivery_price'
+        'delivery_price',
+        'area_id',
+        'city_id',
     ];
 
     public function getItemsAttribute($value)
@@ -91,5 +93,15 @@ class Order extends Model
     public function branch()
     {
         return $this->belongsTo(Branch::class);
+    }
+
+    public function area()
+    {
+        return $this->belongsTo(Area::class);
+    }
+
+    public function city()
+    {
+        return $this->belongsTo(City::class);
     }
 }

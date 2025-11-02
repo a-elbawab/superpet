@@ -92,4 +92,9 @@ return [
         Order::DELIVERY_METHOD_PICKUP => 'Branch pickup',
         Order::DELIVERY_METHOD_DELIVERY => 'Delivery',
     ],
+
+    'validation' => [
+        'city_required_for_delivery' => 'Please select an area to determine delivery location.',
+        'payment_method_not_allowed' => 'The selected payment method is not available. Allowed methods: :allowed_methods',
+    ],
 ];

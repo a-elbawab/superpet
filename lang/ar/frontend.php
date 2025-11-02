@@ -161,6 +161,7 @@ return [
         'phone' => 'رقم الهاتف',
         'address' => 'العنوان',
         'payment_method' => 'طريقة الدفع',
+        'delivery_method' => 'طريقة التوصيل',
         'submit' => 'ارسال',
         'select_branch' => 'اختر الفرع',
         'select_area' => 'اختر المنطقه',
