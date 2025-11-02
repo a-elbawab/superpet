@@ -169,6 +169,28 @@
                                 @endforeach
                             </select>
                         </div>
+                        <div class="mb-3" id="shipping_note_div">
+                            <div class="alert alert-info border-start border-info border-4 bg-light" role="alert">
+                                <div class="d-flex align-items-start mb-2">
+                                    <i class="fa fa-info-circle text-info me-2 mt-1"></i>
+                                    <div class="flex-grow-1">
+                                        <h6 class="alert-heading mb-2 fw-semibold">
+                                            <i class="fa fa-truck me-1"></i>@lang('frontend.orders.shipping_info')
+                                        </h6>
+                                        <div class="mb-2">
+                                            <div class="d-flex align-items-start mb-2">
+                                                <i class="fa fa-map-marker-alt text-primary me-2 mt-1"></i>
+                                                <div>{!! __('frontend.orders.shipping_note_within_alexandria') !!}</div>
+                                            </div>
+                                            <div class="d-flex align-items-start">
+                                                <i class="fa fa-globe text-success me-2 mt-1"></i>
+                                                <div>{!! __('frontend.orders.shipping_note_outside_alexandria') !!}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <button type="submit" class="btn btn-success w-100">@lang('frontend.orders.submit')</button>
                     </form>
                 </div>
