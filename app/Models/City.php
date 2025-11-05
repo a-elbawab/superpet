@@ -16,6 +16,8 @@ class City extends Model implements TranslatableContract
 {
     use HasFactory, Translatable, Filterable, Selectable, SoftDeletes;
 
+    const ALEXANDRIA_CITY_ID = 24;
+
     /**
      * The translated attributes that are mass assignable.
      *

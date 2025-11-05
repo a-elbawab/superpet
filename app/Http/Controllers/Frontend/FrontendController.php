@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Events\FeedbackSent;
+use App\Helpers\CheckoutHelper;
 use App\Http\Requests\ContactRequest;
 use App\Http\Requests\FrontOrderRequest;
 use App\Models\Admin;
 use App\Models\Area;
 use App\Models\Branch;
 use App\Models\Category;
+use App\Models\City;
 use App\Models\Feedback;
 use App\Models\Gallery;
 use App\Models\Invoice;
@@ -99,7 +101,7 @@ class FrontendController extends Controller
     {
         $title = "registration";
 
-        $cities = \App\Models\City::whereHas('country', function ($query) {
+        $cities = City::whereHas('country', function ($query) {
             $query->where('code', 'eg');
         })->get()->pluck('name', 'id')->toArray();
 
@@ -320,7 +322,12 @@ class FrontendController extends Controller
     public function showOrderPage(Request $request)
     {
         $branches = Branch::all();
-        $areas = Area::orderBy('position')->whereHas('city.country', function ($query) {
+        $cities = City::with(['areas' => function ($query) {
+            $query->orderBy('position');
+        }])->whereHas('country', function ($query) {
+            $query->where('code', 'eg');
+        })->get();
+        $areas = Area::with('city')->orderBy('position')->whereHas('city.country', function ($query) {
             $query->where('code', 'eg');
         })->get();
         $cartItems = session()->get('cartItems');
@@ -342,7 +349,7 @@ class FrontendController extends Controller
 
         $finalTotal = $totalPrice - $discount;
 
-        return view('frontend.cart.order', compact('cartItems', 'percentageDiscount', 'finalTotal', 'totalPrice', 'discount', 'branches', 'areas'));
+        return view('frontend.cart.order', compact('cartItems', 'percentageDiscount', 'finalTotal', 'totalPrice', 'discount', 'branches', 'areas', 'cities'));
     }
 
 
@@ -352,10 +359,16 @@ class FrontendController extends Controller
      */
     public function processOrder(FrontOrderRequest $request)
     {
+        // Resolve the city for the order
+        // Priority 1: Use city_id from form if available
+        // Priority 2: Resolve from area_id
+        $cityId = $request->city_id ?? CheckoutHelper::resolveCheckoutCityId($request->area_id);
+
         $request->merge([
             'user_id' => auth()->id(),
             'discount' => Order::getOrderDiscount($request->total),
-            'delivery_price' => $request->delivery_price
+            'delivery_price' => $request->delivery_price ?? 0,
+            'city_id' => $cityId,
         ]);
 
         /**
@@ -379,6 +392,27 @@ info($request->all());
         flash()->overlay(" ", trans('feedback.messages.created'));
 
         return redirect()->route('success', $order);
+    }
+
+    /**
+     * AJAX endpoint to get area shipping price and city info
+     *
+     * @param int $areaId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getAreaShippingPrice($areaId)
+    {
+        $area = Area::with('city')->find($areaId);
+
+        if (!$area) {
+            return response()->json(['error' => 'Area not found'], 404);
+        }
+
+        return response()->json([
+            'shipping_price' => $area->shipping_price ?? 0,
+            'city_id' => $area->city_id,
+            'city_name' => $area->city->name ?? null,
+        ]);
     }
 
 
